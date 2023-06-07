@@ -16,8 +16,6 @@ const createCell = () => {
 
 const gameBoard = (() => {
     const board = [];
-    const playerOneMarks = [];  //Do I want to keep an array of the marks of players?
-    const playerTwoMarks = [];
 
     for (let i = 0; i < 9; i++) {
         const cell = createCell();
@@ -55,17 +53,18 @@ const gameController = ((playerOneName = "Player One", playerTwoName = "Player T
 
     const checkForWinner = (board, mark) => {
         let isWinner = false;
-        const marked = []; //Do I want make a new array every time a move is made?
+        const marked = [];
         for (let i = 0; i < 9; i++) {
             if (board[i].getValue() === mark) marked.push(i);
         }
-        console.log(marked);
         for (let i = 0; i < winners.length; i++) {
             isWinner = winners[i].every(winningPosition => marked.includes(winningPosition));
             if (isWinner) break;
         }
         return isWinner;
     }
+
+    const checkGameOver = () => gameOver;
 
     const playRound = (position) => {
         roundNumber++;
@@ -76,7 +75,7 @@ const gameController = ((playerOneName = "Player One", playerTwoName = "Player T
         } else switchPlayerTurn();
     }
 
-    return {playRound, getActivePlayer, checkForWinner, getRound};
+    return {playRound, getActivePlayer, checkForWinner, getRound, checkGameOver};
 })();
 
 const displayController = (() => {
@@ -99,7 +98,7 @@ const displayController = (() => {
         board.forEach((cell, position) => {
             const cellButton = document.createElement("button");
             cellButton.classList.add("cell");
-            cellButton.dataset.position = position; //check that this is doing the right thing
+            cellButton.dataset.position = position;
             cellButton.textContent = cell.getValue();
             boardDiv.appendChild(cellButton);
         });
@@ -107,7 +106,7 @@ const displayController = (() => {
 
     function clickHandlerBoard(e) {
         const selectedCell = e.target.dataset.position;
-        if (!selectedCell) return;
+        if (!selectedCell || gameController.checkGameOver()) return;
 
         gameController.playRound(selectedCell);
         updateScreen();
