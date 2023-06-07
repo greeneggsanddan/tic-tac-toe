@@ -20,6 +20,7 @@ body {
 .turn {
   font-size: 3rem;
   margin-bottom: 32px;
+  align-self: left;
 }
 
 .board {

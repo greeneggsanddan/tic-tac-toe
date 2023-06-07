@@ -1,6 +1,6 @@
 const createPlayer = (name, mark) => {
     return {name, mark}
-}
+};
 
 const createCell = () => {
     let value = null;
@@ -12,23 +12,26 @@ const createCell = () => {
     const getValue = () => value;
 
     return {addMark, getValue};
-}
+};
 
 const gameBoard = (() => {
     const board = [];
 
-    for (let i = 0; i < 9; i++) {
-        const cell = createCell();
-        board.push(cell);
-    }
+    const createBoard = () => {
+        for (let i = 0; i < 9; i++) {
+            const cell = createCell();
+            // board.push(cell);
+            board[i] = cell;
+        }
+    };
 
     const getBoard = () => board;
 
     const markCell = (position, mark) => {
         board[position].addMark(mark);
-    }
+    };
 
-    return {getBoard, markCell};
+    return {getBoard, markCell, createBoard};
 })();
 
 const gameController = ((playerOneName = "Player One", playerTwoName = "Player Two") => {
@@ -45,7 +48,7 @@ const gameController = ((playerOneName = "Player One", playerTwoName = "Player T
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === playerOne ? playerTwo : playerOne;
-    }
+    };
 
     const getActivePlayer = () => activePlayer;
 
@@ -62,7 +65,7 @@ const gameController = ((playerOneName = "Player One", playerTwoName = "Player T
             if (isWinner) break;
         }
         return isWinner;
-    }
+    };
 
     const checkGameOver = () => gameOver;
 
@@ -76,14 +79,21 @@ const gameController = ((playerOneName = "Player One", playerTwoName = "Player T
                 gameOver = true;
             } else switchPlayerTurn();
         }
-    }
+    };
 
-    return {playRound, getActivePlayer, checkForWinner, getRound, checkGameOver};
+    const restartGame = () => {
+        activePlayer = playerOne;
+        roundNumber = 0;
+        gameOver = false;
+    };
+
+    return {playRound, getActivePlayer, checkForWinner, getRound, checkGameOver, restartGame};
 })();
 
 const displayController = (() => {
     const playerTurnDiv = document.querySelector(".turn");
     const boardDiv = document.querySelector(".board");
+    const restartButton = document.querySelector(".restart");
 
     const updateScreen = () => {
         boardDiv.textContent = "";
@@ -105,16 +115,23 @@ const displayController = (() => {
             cellButton.textContent = cell.getValue();
             boardDiv.appendChild(cellButton);
         });
-    }
+    };
 
     function clickHandlerBoard(e) {
         const selectedCell = e.target.dataset.position;
         if (!selectedCell || gameController.checkGameOver()) return;
-
         gameController.playRound(selectedCell);
         updateScreen();
     }
 
+    function restart() {
+        gameBoard.createBoard();
+        gameController.restartGame();
+        updateScreen();
+    }
+
     boardDiv.addEventListener("click", clickHandlerBoard);
+    restartButton.addEventListener("click", restart);
+    gameBoard.createBoard();
     updateScreen();
 })();
