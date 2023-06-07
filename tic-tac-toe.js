@@ -67,12 +67,15 @@ const gameController = ((playerOneName = "Player One", playerTwoName = "Player T
     const checkGameOver = () => gameOver;
 
     const playRound = (position) => {
-        roundNumber++;
-        const mark = getActivePlayer().mark;
-        gameBoard.markCell(position, mark);
-        if (checkForWinner(gameBoard.getBoard(), mark) || roundNumber === 9) {
-            gameOver = true;
-        } else switchPlayerTurn();
+        const board = gameBoard.getBoard();
+        if (board[position].getValue() === null) {
+            roundNumber++;
+            const mark = getActivePlayer().mark;
+            gameBoard.markCell(position, mark);
+            if (checkForWinner(board, mark) || roundNumber === 9) {
+                gameOver = true;
+            } else switchPlayerTurn();
+        }
     }
 
     return {playRound, getActivePlayer, checkForWinner, getRound, checkGameOver};
